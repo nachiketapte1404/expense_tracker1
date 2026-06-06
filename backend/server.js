@@ -1,170 +1,64 @@
-const express = require('express');
-const { Client } = require('pg');
-const cors = require('cors');
+console.log("starting server.js");
+
+// ERROR LISTENERS
+// for debugging
+// process.on('unhandledRejection', (reason, promise) => {
+//     console.error('UNHANDLED REJECTION:', reason);
+// });
+
+// process.on('uncaughtException', (error) => {
+//     console.error('UNCAUGHT EXCEPTION:', error.message);
+//     console.error(error.stack);
+// });
+
 require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+
+
+const db = require("./config/db"); 
+//for debugging
+// db.execute("SELECT 1")
+//     .then(() => {
+//         console.log("Database connection successful");
+//     })
+//     .catch((err) => {
+//         console.error("DB connection failed with error:", err.message);
+//     });
+
+
+const authRoutes = require("./routes/authRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
+
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const authRoutes = require("./routes/authRoutes");
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
+}));
+
 app.use(express.json());
+
+// for debugging
+// app.use((req, res, next) => {
+//     console.log(`${req.method} ${req.path}`);
+//     next();
+// });
+
 app.use("/api/auth", authRoutes);
-
-const db = new Client({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 5432,
-});
-
-db.connect()
-    .then(() => {
-        console.log('Connected to PostgreSQL Database.');
-    })
-    .catch((err) => {
-        console.error('Database connection failed:', err);
-    });
+app.use("/api/expenses", expenseRoutes);
 
 app.get("/", (req, res) => {
+    console.log("✓ Root path matched!");
     res.send("Backend Running");
 });
-// Get all expenses
-app.get('/expenses', (req, res) => {
-    const userId = req.query.user_id || 1;
 
-    const sql = `
-        SELECT *
-        FROM Expenses
-        WHERE user_id = $1
-        ORDER BY expense_date DESC
-    `;
-
-    db.query(sql, [userId], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-
-        res.json(result.rows);
-    });
-});
-
-// Add a new expense
-app.post('/expenses', (req, res) => {
-    const {
-        amount,
-        description,
-        expense_date,
-        category_id,
-        user_id,
-    } = req.body;
-
-    const sql = `
-        INSERT INTO Expenses
-        (amount, description, expense_date, category_id, user_id)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id
-    `;
-
-    db.query(
-        sql,
-        [
-            amount,
-            description,
-            expense_date,
-            category_id,
-            user_id || 1,
-        ],
-        (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: err.message });
-            }
-
-            res.status(201).json({
-                message: 'Expense added successfully',
-                expenseId: result.rows[0].id,
-            });
-        }
-    );
-});
-
-// Edit an existing expense
-app.put('/expenses/:id', (req, res) => {
-    const { id } = req.params;
-
-    const {
-        amount,
-        description,
-        expense_date,
-        category_id,
-    } = req.body;
-
-    const sql = `
-        UPDATE Expenses
-        SET
-            amount = $1,
-            description = $2,
-            expense_date = $3,
-            category_id = $4
-        WHERE id = $5
-        RETURNING id
-    `;
-
-    db.query(
-        sql,
-        [
-            amount,
-            description,
-            expense_date,
-            category_id,
-            id,
-        ],
-        (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: err.message });
-            }
-
-            if (result.rowCount === 0) {
-                return res.status(404).json({
-                    error: 'Expense not found',
-                });
-            }
-
-            res.json({
-                message: 'Expense updated successfully',
-            });
-        }
-    );
-});
-
-// Remove an expense
-app.delete('/expenses/:id', (req, res) => {
-    const { id } = req.params;
-
-    const sql = `
-        DELETE FROM Expenses
-        WHERE id = $1
-        RETURNING id
-    `;
-
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-
-        if (result.rowCount === 0) {
-            return res.status(404).json({
-                error: 'Expense not found',
-            });
-        }
-
-        res.json({
-            message: 'Expense deleted successfully',
-        });
-    });
-});
-
+const PORT = process.env.PORT ;
 
 app.listen(PORT, () => {
-    console.log(`Backend server is running on port ${PORT}`);
+    console.log(`Backend server running on port ${PORT}`);
 });
