@@ -23,29 +23,21 @@ const register = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      10
-    );
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute(
-      `
-      INSERT INTO users
-      (name,email,password)
-      VALUES (?,?,?)
-      `,
+      `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`,
       [name, email, hashedPassword]
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "User registered successfully",
     });
 
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      message: "Server error",
+    console.error("Registration error:", error);
+    return res.status(500).json({
+      message: "Server error: " + error.message,
     });
   }
 };
