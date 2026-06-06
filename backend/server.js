@@ -5,10 +5,10 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+const authRoutes = require("./routes/authRoutes");
 app.use(cors());
 app.use(express.json());
-
+app.use("/api/auth", authRoutes);
 
 const db = new Client({
     host: process.env.DB_HOST,
@@ -26,6 +26,9 @@ db.connect()
         console.error('Database connection failed:', err);
     });
 
+app.get("/", (req, res) => {
+    res.send("Backend Running");
+});
 // Get all expenses
 app.get('/expenses', (req, res) => {
     const userId = req.query.user_id || 1;
