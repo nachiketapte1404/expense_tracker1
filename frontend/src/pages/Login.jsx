@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { loginUser } from "../services/authService";
+import { loginUser } from "../api";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
+
 function Login() {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   const [formData, setFormData] =
     useState({
@@ -22,34 +24,24 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
+      const response = await loginUser(formData);
 
-      const response =
-        await loginUser(formData);
-
-      localStorage.setItem(
-        "token",
-        response.data.token
-      );
-
-      alert("Login Successful");
-
+      localStorage.setItem("token", response.data.token);
       navigate("/dashboard");
 
     } catch (error) {
-
-      alert(
-        error.response?.data?.message ||
-        "Login Failed"
-      );
-
+      const errorMsg = error.response?.data?.message || error.message || "Login failed";
+      setError(errorMsg);
     }
   };
 
   return (
     <div>
       <h2>Login</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <form onSubmit={handleSubmit}>
 
