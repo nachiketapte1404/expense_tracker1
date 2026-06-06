@@ -45,3 +45,4 @@ export const fetchCategories = () => API.get('/categories').catch(() => ({
         { id: 6, category_name: 'Miscellaneous' }
     ]
 }));
+export const createCategory = (categoryData) => API.post("/categories", categoryData);
