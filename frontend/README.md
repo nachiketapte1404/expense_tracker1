@@ -1,8 +1,17 @@
-# React + Vite
+Expense Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full stack project for expense management
 
-Currently, two official plugins are available:
+Instructions for running:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+create a .env file in backend folder
+add the following credentials to it:
+PORT=5000
+CORS_ORIGIN=http://localhost:5173
+JWT_SECRET=<jwt secret token>
+
+# MySQL Database Configuration
+DB_HOST=127.0.0.1
+DB_USER=username
+DB_PASSWORD=password
+DB_NAME=db_name
