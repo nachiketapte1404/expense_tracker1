@@ -114,6 +114,37 @@ function Dashboard() {
   };
 
   const total = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  const totalCategories = categories.length;
+
+const currentMonth = new Date().getMonth();
+const currentYear = new Date().getFullYear();
+
+const monthlyExpense = expenses
+  .filter((exp) => {
+    const date = new Date(exp.expense_date);
+    return (
+      date.getMonth() === currentMonth &&
+      date.getFullYear() === currentYear
+    );
+  })
+  .reduce((sum, exp) => sum + Number(exp.amount), 0);
+
+const categoryTotals = {};
+
+expenses.forEach((expense) => {
+  const categoryName = getCategoryName(expense.category_id);
+
+  categoryTotals[categoryName] =
+    (categoryTotals[categoryName] || 0) +
+    Number(expense.amount);
+});
+
+const highestCategory =
+  Object.keys(categoryTotals).length > 0
+    ? Object.keys(categoryTotals).reduce((a, b) =>
+        categoryTotals[a] > categoryTotals[b] ? a : b
+      )
+    : "N/A";
 
   return (
     <div className="dashboard-page-wrapper">
@@ -127,8 +158,38 @@ function Dashboard() {
         <div>
           <h1>Expense Tracker</h1>
         </div>
+      
         <button onClick={logout} className="btn btn-logout">Logout</button>
       </div>
+
+      <div className="dashboard-cards">
+
+  <div className="dashboard-card">
+    <h3>Total Expenses</h3>
+    <p>₹{total.toFixed(2)}</p>
+  </div>
+
+  <div className="dashboard-card">
+    <h3>Total Entries</h3>
+    <p>{expenses.length}</p>
+  </div>
+
+  <div className="dashboard-card">
+    <h3>Total Categories</h3>
+    <p>{totalCategories}</p>
+  </div>
+
+  <div className="dashboard-card">
+    <h3>Top Category</h3>
+    <p>{highestCategory}</p>
+  </div>
+
+  <div className="dashboard-card">
+    <h3>This Month</h3>
+    <p>₹{monthlyExpense.toFixed(2)}</p>
+  </div>
+
+</div>
 
       {/* SUMMARY PILL */}
       {expenses.length > 0 && (
