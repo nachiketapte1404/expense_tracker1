@@ -87,6 +87,7 @@ function Dashboard() {
       expense_date: formattedDate,
       category_id: expense.category_id
     });
+    document.getElementById("expense-form-section")?.scrollIntoView({ behavior: "smooth" });
     // window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -201,7 +202,7 @@ const highestCategory =
       )}
 
       {/* FORM CARD */}
-      <div className={`form-card ${editingId ? 'form-card--editing' : ''}`}>
+      <div id="expense-form-section" className={`form-card ${editingId ? 'form-card--editing' : ''}`}>
         <h3 className="form-card-title">
           {editingId ? "Edit Expense" : "Add New Expense"}
         </h3>
