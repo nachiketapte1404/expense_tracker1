@@ -16,7 +16,7 @@ const express = require('express');
 const cors = require('cors');
 
 
-const db = require("./config/db"); 
+const db = require("./config/db");
 //for debugging
 // db.execute("SELECT 1")
 //     .then(() => {
@@ -33,12 +33,27 @@ const categoryRoutes = require("./routes/categoryRoutes");
 
 const app = express();
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://expense-tracker1-eosin-iota.vercel.app'
+];
+
+if (process.env.CORS_ORIGIN) {
+    allowedOrigins.push(process.env.CORS_ORIGIN);
+}
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173' || 'https://expense-tracker1-eosin-iota.vercel.app',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1)
+            return callback(null, true);
+        else
+            return callback(new Error('Blocked by CORS policy'), false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200
 }));
 
 app.use(express.json());
