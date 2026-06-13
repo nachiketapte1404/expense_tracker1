@@ -87,7 +87,7 @@ function Dashboard() {
       expense_date: formattedDate,
       category_id: expense.category_id
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancel = () => {
@@ -203,7 +203,7 @@ const highestCategory =
       {/* FORM CARD */}
       <div className={`form-card ${editingId ? 'form-card--editing' : ''}`}>
         <h3 className="form-card-title">
-          {editingId ? "✏️ Edit Expense" : "Add New Expense"}
+          {editingId ? "Edit Expense" : "Add New Expense"}
         </h3>
         <form onSubmit={handleSubmit} className="expense-form">
           <div className="form-grid">
